@@ -1,4 +1,3 @@
--- State management
 local M = {}
 
 -- Global state
@@ -70,7 +69,7 @@ function M.cleanup_node_cache()
       needed_paths[current] = true
     end
   end
-  
+
   -- Create a new cache with only the needed nodes
   local new_cache = {}
   for path, node in pairs(M.node_cache) do
@@ -78,9 +77,8 @@ function M.cleanup_node_cache()
       new_cache[path] = node
     end
   end
-  
+
   M.node_cache = new_cache
 end
 
 return M
-

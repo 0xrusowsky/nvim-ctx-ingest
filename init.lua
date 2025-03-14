@@ -2,11 +2,10 @@
 local M = {}
 
 -- Import modules
-local config = require('ctx-ingest.config')
-local state = require('ctx-ingest.state')
-local fs = require('ctx-ingest.fs')
-local ui = require('ctx-ingest.ui')
-local utils = require('ctx-ingest.utils')
+local config = require("ctx-ingest.config")
+local state = require("ctx-ingest.state")
+local fs = require("ctx-ingest.fs")
+local ui = require("ctx-ingest.ui")
 
 -- Initialize the plugin
 function M.setup(user_config)
@@ -17,15 +16,17 @@ end
 function M.open()
   state.reset()
   local buf = ui.setup_buffer()
-  if not buf then return end
-  
+  if not buf then
+    return
+  end
+
   state.buf = buf
   state.win = ui.create_window(buf)
-  
+
   -- Set root as expanded before scanning
   local root_path = vim.fn.getcwd()
   state.expanded_paths[root_path] = true
- 
+
   -- Initial scan with limited depth
   state.tree = fs.scan_directory(root_path)
 
@@ -36,7 +37,7 @@ function M.open()
 
   vim.schedule(function()
     if vim.api.nvim_win_is_valid(state.win) then
-      vim.api.nvim_win_set_cursor(state.win, {8, 0})
+      vim.api.nvim_win_set_cursor(state.win, { 8, 0 })
     end
   end)
 end
@@ -46,31 +47,33 @@ function M.add_pattern(pattern_type)
   vim.ui.input({
     prompt = string.format("Add %s pattern: ", pattern_type),
   }, function(input)
-    if not input or input == "" then return end
-    
+    if not input or input == "" then
+      return
+    end
+
     -- Store current tree state
     local old_tree = state.tree
-    
+
     -- Add the pattern to the appropriate list
     if pattern_type == "include" then
       table.insert(config.get().patterns.include, input)
     else
       table.insert(config.get().patterns.exclude, input)
     end
-    
+
     -- Reset selections if adding an include pattern
     if pattern_type == "include" then
       state.selected_files = {}
     end
-    
+
     -- Re-render the tree with updated patterns
     state.tree = fs.scan_directory(vim.fn.getcwd())
-    
+
     -- If this is the first scan, expand root
     if not old_tree then
       state.tree.expanded = true
     end
-    
+
     ui.render()
   end)
 end
@@ -79,7 +82,9 @@ end
 function M.ingest()
   local selected_count = 0
   for _, selected in pairs(state.selected_files) do
-    if selected then selected_count = selected_count + 1 end
+    if selected then
+      selected_count = selected_count + 1
+    end
   end
 
   if selected_count == 0 then
@@ -96,7 +101,7 @@ function M.ingest()
     -- Collect selected files and generate content
     local selected_paths, total_size, file_count = fs.collect_selected_files()
     local content = fs.generate_digest(selected_paths, total_size, file_count)
-    
+
     -- Save to file if configured
     if config.get().output.save_file then
       local success = fs.write_file(filename, content)
@@ -106,13 +111,13 @@ function M.ingest()
         vim.notify("Failed to write output file", vim.log.levels.ERROR)
       end
     end
-    
+
     -- Copy to clipboard if configured
     if config.get().output.copy_clipboard then
-      vim.fn.setreg('+', content)
+      vim.fn.setreg("+", content)
       vim.notify("Content copied to clipboard", vim.log.levels.INFO)
     end
-    
+
     -- Close the window
     if state.win and vim.api.nvim_win_is_valid(state.win) then
       vim.api.nvim_win_close(state.win, true)
@@ -125,7 +130,9 @@ function M.ingest()
       prompt = "Output filename: ",
       default = "digest.txt",
     }, function(filename)
-      if not filename then return end
+      if not filename then
+        return
+      end
       process_ingestion(filename)
     end)
   else
@@ -138,9 +145,12 @@ end
 return setmetatable(M, {
   __index = function(_, key)
     -- Forward other function calls to appropriate modules
-    if ui[key] then return ui[key] end
-    if fs[key] then return fs[key] end
+    if ui[key] then
+      return ui[key]
+    end
+    if fs[key] then
+      return fs[key]
+    end
     return nil
-  end
+  end,
 })
-

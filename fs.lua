@@ -1,24 +1,28 @@
 -- File system operations
 local M = {}
 
-local config = require('ctx-ingest.config')
-local state = require('ctx-ingest.state')
+local config = require("ctx-ingest.config")
+local state = require("ctx-ingest.state")
 local fs_cache = {}
 
 -- Get file info
 function M.get_file_info(path)
   -- Check cache first
-  if fs_cache[path] then return fs_cache[path] end
-  
+  if fs_cache[path] then
+    return fs_cache[path]
+  end
+
   local stat = vim.loop.fs_stat(path)
-  if not stat then return nil end
-  
+  if not stat then
+    return nil
+  end
+
   local info = {
     size = stat.size,
     type = stat.type,
     mtime = stat.mtime.sec,
   }
-  
+
   -- Store in cache
   fs_cache[path] = info
   return info
@@ -37,43 +41,43 @@ function M.parse_gitignore()
       if line ~= "" and not line:match("^%s*#") then
         -- Convert .gitignore pattern to Lua pattern
         local pattern = line
-          :gsub("^%s+", "")  -- Remove leading whitespace
-          :gsub("%s+$", "")  -- Remove trailing whitespace
-          :gsub("([%^%$%(%)%%%.%[%]%+%-%?])", "%%%1")  -- Escape special characters
-          :gsub("%*%*", ".*")  -- Convert ** to .*
-          :gsub("%*", "[^/]*")  -- Convert * to [^/]*
-          :gsub("^/", "^")  -- Convert leading / to ^
+            :gsub("^%s+", "")                    -- Remove leading whitespace
+            :gsub("%s+$", "")                    -- Remove trailing whitespace
+            :gsub("([%^%$%(%)%%%.%[%]%+%-%?])", "%%%1") -- Escape special characters
+            :gsub("%*%*", ".*")                  -- Convert ** to .*
+            :gsub("%*", "[^/]*")                 -- Convert * to [^/]*
+            :gsub("^/", "^")                     -- Convert leading / to ^
         table.insert(patterns, pattern)
       end
     end
   end
-  
+
   return patterns
 end
 
 -- Add pattern to .gitignore
 function M.add_to_gitignore(pattern)
   local gitignore_path = vim.fn.getcwd() .. "/.gitignore"
-  
+
   -- Read existing content
   local lines = {}
   if vim.fn.filereadable(gitignore_path) == 1 then
     lines = vim.fn.readfile(gitignore_path)
   end
-  
+
   -- Check if pattern already exists
   for _, line in ipairs(lines) do
     if line == pattern then
-      return  -- Pattern already exists
+      return -- Pattern already exists
     end
   end
-  
+
   -- Add pattern with a newline before if file is not empty
   if #lines > 0 and lines[#lines] ~= "" then
     table.insert(lines, "")
   end
   table.insert(lines, pattern)
-  
+
   -- Write back to .gitignore
   vim.fn.writefile(lines, gitignore_path)
 end
@@ -81,7 +85,7 @@ end
 -- Check if a path should be ignored
 function M.should_ignore(path)
   local relative_path = vim.fn.fnamemodify(path, ":.")
-  
+
   -- Check exclude patterns first
   for _, pattern in ipairs(config.get().patterns.exclude) do
     if relative_path:match(pattern) then
@@ -93,7 +97,7 @@ function M.should_ignore(path)
   if vim.fn.isdirectory(path) == 1 and not relative_path:match("/$") then
     relative_path = relative_path .. "/"
   end
- 
+
   -- Check configured ignore patterns
   for _, pattern in ipairs(config.get().ignore_patterns) do
     -- Ensure pattern ends with / if it's meant for directories
@@ -102,7 +106,7 @@ function M.should_ignore(path)
       return true
     end
   end
-  
+
   -- Check .gitignore patterns if enabled
   if config.get().gitignore.respect then
     local gitignore_patterns = M.parse_gitignore()
@@ -114,7 +118,7 @@ function M.should_ignore(path)
       end
     end
   end
-  
+
   return false
 end
 
@@ -133,21 +137,21 @@ end
 -- Check if a path should be excluded based on patterns
 function M.should_exclude(path)
   local relative_path = vim.fn.fnamemodify(path, ":.")
-  
+
   -- Check exclude patterns
   for _, pattern in ipairs(config.get().patterns.exclude) do
     if relative_path:match(pattern) then
       return true
     end
   end
-  
+
   -- Check configured ignore patterns
   for _, pattern in ipairs(config.get().ignore_patterns) do
     if relative_path:match(pattern) then
       return true
     end
   end
-  
+
   -- Check .gitignore patterns if enabled
   if config.get().gitignore.respect then
     local gitignore_patterns = M.parse_gitignore()
@@ -157,27 +161,27 @@ function M.should_exclude(path)
       end
     end
   end
-  
+
   return false
 end
 
 -- Scan directory and build tree
 function M.scan_directory(path, parent, depth)
-  depth = depth or 1  -- Default depth is 1 (expanded root)
-  local max_initial_depth = 1  -- Only scan 1 level deep initially
-  
+  depth = depth or 1
+  local max_initial_depth = 1
+
   local node = {
     name = vim.fn.fnamemodify(path, ":t"),
     path = path,
     type = vim.fn.isdirectory(path) == 1 and "directory" or "file",
     parent = parent,
     expanded = state.expanded_paths[path] or false,
-    loaded = false,  -- Track if children have been loaded
+    loaded = false, -- Track if children have been loaded
   }
-  
+
   -- Only check exclude patterns for ignored state
   node.ignored = M.should_exclude(path) or M.is_in_ignored_path(path)
-  
+
   -- If there are include patterns and this is a file, check for auto-selection
   if not node.ignored and node.type == "file" and #config.get().patterns.include > 0 then
     local relative_path = vim.fn.fnamemodify(path, ":.")
@@ -188,7 +192,7 @@ function M.scan_directory(path, parent, depth)
       end
     end
   end
-  
+
   -- Cache file info (size, modified time) to avoid repeated stat calls
   if not node.ignored then
     local info = M.get_file_info(path)
@@ -197,55 +201,57 @@ function M.scan_directory(path, parent, depth)
       node.mtime = info.mtime
     end
   end
-  
+
   -- Only load children if within initial depth or if expanded
   if node.type == "directory" and (depth < max_initial_depth or node.expanded) then
     node.children = {}
     node.loaded = true
-    
+
     for name, type in vim.fs.dir(path) do
       if name ~= "." and name ~= ".." then
         local child_path = path .. "/" .. name
         table.insert(node.children, M.scan_directory(child_path, node, depth + 1))
       end
     end
-    
-    table.sort(node.children, function(a, b) 
+
+    table.sort(node.children, function(a, b)
       if a.type == b.type then
         return a.name < b.name
       end
       return a.type == "directory"
     end)
   end
-  
+
   -- Add to node cache
   state.node_cache[node.path] = node
-  
+
   return node
 end
 
 -- Expand a node and load its children
 function M.expand_node(path)
   local node = state.node_cache[path]
-  if not node or node.type ~= "directory" then return end
-  
+  if not node or node.type ~= "directory" then
+    return
+  end
+
   -- Mark as expanded
   node.expanded = true
   state.expanded_paths[path] = true
-  
+
   -- Load children if not already loaded
   if not node.loaded then
     node.children = {}
     node.loaded = true
-    
+
     for name, type in vim.fs.dir(path) do
       if name ~= "." and name ~= ".." then
         local child_path = path .. "/" .. name
         table.insert(node.children, M.scan_directory(child_path, node, 0))
       end
     end
-    
-    table.sort(node.children, function(a, b) 
+
+    table.sort(node.children, function(a, b)
       if a.type == b.type then
         return a.name < b.name
       end
@@ -257,11 +263,13 @@ end
 -- Collapse a node
 function M.collapse_node(path)
   local node = state.node_cache[path]
-  if not node or node.type ~= "directory" then return end
-  
+  if not node or node.type ~= "directory" then
+    return
+  end
+
   node.expanded = false
   state.expanded_paths[path] = nil
-  
+
   -- We don't unload children, just keep them in cache for later
 end
 
@@ -270,25 +278,31 @@ function M.collect_selected_files()
   local result = {}
   local total = 0
   local count = 0
-  
+
   -- Helper to check if a path is selected
   local function is_selected(path)
     return state.selected_files[path] == true
   end
-  
+
   -- Recursively collect all selected files from the file system
   local function collect_from_dir(dir_path)
-    if not is_selected(dir_path) then return end
-    
+    if not is_selected(dir_path) then
+      return
+    end
+
     local handle = vim.loop.fs_scandir(dir_path)
-    if not handle then return end
-    
+    if not handle then
+      return
+    end
+
     while true do
       local name, type = vim.loop.fs_scandir_next(handle)
-      if not name then break end
-      
+      if not name then
+        break
+      end
+
       local path = dir_path .. "/" .. name
-      
+
       -- Skip ignored files/directories
       local is_ignored = false
       local node = state.node_cache[path]
@@ -297,14 +311,14 @@ function M.collect_selected_files()
       elseif not node then
         is_ignored = M.should_exclude(path) or M.is_in_ignored_path(path)
       end
-      
+
       if not is_ignored then
         if type == "file" then
           -- Check if this file is selected directly or via a parent directory
           if is_selected(path) or is_selected(dir_path) then
             local info = M.get_file_info(path)
             local size = info and info.size or 0
-            
+
             if not info or size <= config.get().max_file_size then
               table.insert(result, path)
               total = total + size
@@ -320,10 +334,10 @@ function M.collect_selected_files()
       end
     end
   end
-  
+
   -- Start from the root directory
   collect_from_dir(vim.fn.getcwd())
-  
+
   -- Also collect individually selected files that might not be in directories
   for path, selected in pairs(state.selected_files) do
     if selected then
@@ -337,7 +351,7 @@ function M.collect_selected_files()
             break
           end
         end
-        
+
         if not already_included then
           local size = node.size or 0
           if size <= config.get().max_file_size then
@@ -349,14 +363,14 @@ function M.collect_selected_files()
       end
     end
   end
-  
+
   return result, total, count
 end
 
 -- Generate digest content
 function M.generate_digest(selected_paths, total_size, file_count)
   local content = {}
-  
+
   -- Create summary
   local summary = {
     string.format("Directory: %s", vim.fn.getcwd()),
@@ -364,33 +378,35 @@ function M.generate_digest(selected_paths, total_size, file_count)
     string.format("Total size: %.2f MB", total_size / 1024 / 1024),
     "",
   }
-  
+
   for _, line in ipairs(summary) do
     table.insert(content, line)
   end
-  
+
   -- Write full directory structure with ASCII lines
   table.insert(content, "Directory structure:")
-  
+
   -- Helper function to print tree with ASCII lines
   local function write_tree_node(node, prefix, is_last, excluded_paths)
-    if excluded_paths[node.path] then return end
-    
+    if excluded_paths[node.path] then
+      return
+    end
+
     local line = prefix
-    if node.parent then -- Skip for root node
+    if node.parent then
       if is_last then
         line = line .. "└── "
-        prefix = prefix .. "    " -- 4 spaces for next level
+        prefix = prefix .. "    "
       else
         line = line .. "├── "
-        prefix = prefix .. "│   " -- vertical line for next level
+        prefix = prefix .. "│   "
       end
     end
-    
+
     -- Write the node name without icons
     line = line .. node.name
     table.insert(content, line)
-    
+
     -- Process children
     if node.type == "directory" and node.children then
       for i, child in ipairs(node.children) do
@@ -447,24 +463,27 @@ end
 -- Read file content
 function M.read_file(path)
   local file = io.open(path, "r")
-  if not file then return nil end
-  
+  if not file then
+    return nil
+  end
+
   local content = file:read("*a")
   file:close()
-  
+
   return content
 end
 
 -- Write file content
 function M.write_file(path, content)
   local file = io.open(path, "w")
-  if not file then return false end
-  
+  if not file then
+    return false
+  end
+
   file:write(content)
   file:close()
-  
+
   return true
 end
 
 return M
-

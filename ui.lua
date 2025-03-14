@@ -1,4 +1,3 @@
--- UI rendering and interaction
 local M = {}
 
 local config = require("ctx-ingest.config")
@@ -49,7 +48,7 @@ function M.create_tree_lines(node, level, lines, selections)
   local has_children = node.type == "directory" and (node.children and #node.children > 0)
   local icon = M.get_file_icon(node.name, ext, node.type, node.expanded, has_children)
   local checkbox = node.ignored and " "
-    or (selections[node.path] and config.get().icons.selected or config.get().icons.unselected)
+      or (selections[node.path] and config.get().icons.selected or config.get().icons.unselected)
 
   -- Fixed widths for each column
   local name_col_width = 53
@@ -118,8 +117,10 @@ function M.setup_buffer()
   local total_width = name_col_width + size_col_width + date_col_width
 
   -- Format patterns for display
-  local include_patterns = table.concat(config.get().patterns.include, ", ") or "none"
-  local exclude_patterns = table.concat(config.get().patterns.exclude, ", ") or "none"
+  local include_patterns = #config.get().patterns.include > 0 and table.concat(config.get().patterns.include, ", ")
+      or "none"
+  local exclude_patterns = #config.get().patterns.exclude > 0 and table.concat(config.get().patterns.exclude, ", ")
+      or "none"
 
   -- Calculate padding for right alignment
   local include_base = string.format("   Include patterns: %s", include_patterns)

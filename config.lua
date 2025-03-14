@@ -44,28 +44,31 @@ M.default = {
     "%.DS_Store$",
     "%.gitignore",
     "%.lock",
+    "%.png",
   },
 
   gitignore = {
-    respect = true,  -- Whether to respect .gitignore patterns
-    auto_add = true,  -- Whether to automatically add output file to .gitignore
+    respect = true, -- Whether to respect .gitignore patterns
+    auto_add = true, -- Whether to automatically add output file to .gitignore
   },
   patterns = {
-    include = {},  -- Patterns to explicitly include
-    exclude = {},  -- Patterns to explicitly exclude (takes precedence over include)
+    include = {}, -- Patterns to explicitly include
+    exclude = {}, -- Patterns to explicitly exclude (takes precedence over include)
   },
 
   output = {
-    save_file = false,      -- Whether to save the digest file
-    copy_clipboard = true,  -- Whether to copy content to clipboard
-  }
+    save_file = false,   -- Whether to save the digest file
+    copy_clipboard = true, -- Whether to copy content to clipboard
+  },
 }
 
 local current_config = vim.deepcopy(M.default)
 
 -- Setup config with user options
 function M.setup(user_config)
-  if not user_config then return end
+  if not user_config then
+    return
+  end
 
   local function validate_config(config_table)
     return config_table

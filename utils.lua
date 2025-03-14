@@ -1,4 +1,3 @@
--- Utility functions
 local M = {}
 
 -- Safe operation wrapper
@@ -15,7 +14,7 @@ end
 function M.deep_copy(orig)
   local orig_type = type(orig)
   local copy
-  if orig_type == 'table' then
+  if orig_type == "table" then
     copy = {}
     for orig_key, orig_value in next, orig, nil do
       copy[M.deep_copy(orig_key)] = M.deep_copy(orig_value)
@@ -94,21 +93,31 @@ end
 
 -- Format bytes to human-readable size
 function M.format_bytes(bytes)
-  if bytes < 1024 then return string.format("%d B", bytes) end
-  if bytes < 1024*1024 then return string.format("%.2f KB", bytes/1024) end
-  if bytes < 1024*1024*1024 then return string.format("%.2f MB", bytes/(1024*1024)) end
-  return string.format("%.2f GB", bytes/(1024*1024*1024))
+  if bytes < 1024 then
+    return string.format("%d B", bytes)
+  end
+  if bytes < 1024 * 1024 then
+    return string.format("%.2f KB", bytes / 1024)
+  end
+  if bytes < 1024 * 1024 * 1024 then
+    return string.format("%.2f MB", bytes / (1024 * 1024))
+  end
+  return string.format("%.2f GB", bytes / (1024 * 1024 * 1024))
 end
 
 -- Debounce function
 function M.debounce(fn, ms)
   local timer = vim.loop.new_timer()
   return function(...)
-    local args = {...}
+    local args = { ... }
     timer:stop()
-    timer:start(ms, 0, vim.schedule_wrap(function()
-      fn(unpack(args))
-    end))
+    timer:start(
+      ms,
+      0,
+      vim.schedule_wrap(function()
+        fn(unpack(args))
+      end)
+    )
   end
 end
 
@@ -117,28 +126,31 @@ function M.throttle(fn, ms)
   local timer = vim.loop.new_timer()
   local running = false
   local pending_args = nil
-  
+
   local function execute(...)
     if running then
-      pending_args = {...}
+      pending_args = { ... }
       return
     end
-    
+
     running = true
     fn(...)
-    
-    timer:start(ms, 0, vim.schedule_wrap(function()
-      running = false
-      if pending_args then
-        local args = pending_args
-        pending_args = nil
-        execute(unpack(args))
-      end
-    end))
+
+    timer:start(
+      ms,
+      0,
+      vim.schedule_wrap(function()
+        running = false
+        if pending_args then
+          local args = pending_args
+          pending_args = nil
+          execute(unpack(args))
+        end
+      end)
+    )
   end
-  
+
   return execute
 end
 
 return M
-
