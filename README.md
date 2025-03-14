@@ -2,6 +2,8 @@
 
 A Neovim plugin for efficiently sharing code context with LLMs and AI coding assistants.
 
+![Preview image](preview.png)
+
 ## Introduction
 
 `ctx-ingest` helps easily provide just the relevant context to AI tools like Claude or ChatGPT. It addresses the common burden of sharing relevant parts of your codebase with LLMs in a structured, efficient format.
