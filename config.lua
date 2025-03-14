@@ -1,7 +1,6 @@
--- Configuration handling
 local M = {}
 
--- Default configuration
+-- Default config
 M.default = {
   window = {
     position = "float",
@@ -62,24 +61,21 @@ M.default = {
   }
 }
 
--- Current configuration (initialized with defaults)
 local current_config = vim.deepcopy(M.default)
 
--- Setup configuration with user options
+-- Setup config with user options
 function M.setup(user_config)
   if not user_config then return end
 
-  -- Validate configuration
   local function validate_config(config_table)
-    -- Add validation logic here if needed
     return config_table
   end
 
-  -- Merge configurations
+  -- Merge configs
   current_config = vim.tbl_deep_extend("force", current_config, validate_config(user_config))
 end
 
--- Get current configuration
+-- Get current config
 function M.get()
   return current_config
 end

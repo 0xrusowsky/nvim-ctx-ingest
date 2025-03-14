@@ -3,7 +3,6 @@ local M = {}
 
 local config = require('ctx-ingest.config')
 local state = require('ctx-ingest.state')
-local utils = require('ctx-ingest.utils')
 local fs_cache = {}
 
 -- Get file info
