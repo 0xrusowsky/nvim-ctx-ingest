@@ -19,13 +19,13 @@ By not breaking you workflow, it allows you to be more productive.
 
 ## Features
 
- 📁  Interactive file browser with directory tree visualization
- ✅  Select individual files or entire directories for inclusion
- 🔍  Pattern-based file filtering (include/exclude)
- 🚫  Respects `.gitignore` patterns
- 📊  Generates formatted digest with directory structure and file contents
- 📋  Auto-copy results to clipboard for pasting into LLM interfaces
- 🔄  Auto-add output files to `.gitignore` (if enabled)
+ - 📁  Interactive file browser with directory tree visualization
+ - ✅  Select individual files or entire directories for inclusion
+ - 🔍  Pattern-based file filtering (include/exclude)
+ - 🚫  Respects `.gitignore` patterns
+ - 📊  Generates formatted digest with directory structure and file contents
+ - 📋  Auto-copy results to clipboard for pasting into LLM interfaces
+ - 🔄  Auto-add output files to `.gitignore` (if enabled)
 
 ## Installation
 
