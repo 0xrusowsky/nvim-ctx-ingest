@@ -29,6 +29,7 @@ M.default = {
   max_file_size = 10 * 1024 * 1024,
 
   ignore_patterns = {
+    ".env",
     "^%.git/",
     "%.svn/",
     "%.hg/",

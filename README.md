@@ -15,17 +15,17 @@ The plugin allows you to:
 By providing better context, you get more accurate and helpful responses while maintaining control over exactly what code you share.
 By not breaking you workflow, it allows you to be more productive.
 
-> Inspired by [gitingest](https://github.com/cyclotruc/gitingest), but customizable and run locally.  
+> Inspired by [gitingest](https://github.com/cyclotruc/gitingest), but customizable and local.  
 
 ## Features
 
-- 📁 Interactive file browser with directory tree visualization
-- ✅ Select individual files or entire directories for inclusion
-- 🔍 Pattern-based file filtering (include/exclude)
-- 🚫 Respects `.gitignore` patterns
-- 📊 Generates formatted digest with directory structure and file contents
-- 📋 Auto-copy results to clipboard for pasting into LLM interfaces
-- 🔄 Auto-add output files to `.gitignore` (if enabled)
+ 📁  Interactive file browser with directory tree visualization
+ ✅  Select individual files or entire directories for inclusion
+ 🔍  Pattern-based file filtering (include/exclude)
+ 🚫  Respects `.gitignore` patterns
+ 📊  Generates formatted digest with directory structure and file contents
+ 📋  Auto-copy results to clipboard for pasting into LLM interfaces
+ 🔄  Auto-add output files to `.gitignore` (if enabled)
 
 ## Installation
 
@@ -39,7 +39,7 @@ By not breaking you workflow, it allows you to be more productive.
   },
   config = function()
     require("ctx-ingest").setup({
-      -- your configuration options here
+      -- your config options here
     })
   end,
 }
@@ -53,21 +53,12 @@ use {
   requires = { "nvim-web-devicons" },
   config = function()
     require("ctx-ingest").setup({
-      -- your configuration options here
+      -- your config options here
     })
   end
 }
 ```
 
-### Using [vim-plug](https://github.com/junegunn/vim-plug)
-
-```vim
-Plug 'kyazdani42/nvim-web-devicons' " Required for file icons
-Plug 'yourusername/ctx-ingest'
-
-" After plug#end(), in your init.vim:
-lua require('ctx-ingest').setup({})
-```
 
 ## Usage
 
@@ -129,9 +120,22 @@ require("ctx-ingest").setup({
   max_file_size = 10 * 1024 * 1024, -- 10MB max file size
   
   ignore_patterns = {
+    ".env",
     "^%.git/",
     "%.svn/",
+    "%.hg/",
     "node_modules/",
+    "target/",
+    "dist/",
+    "build/",
+    "%.pyc$",
+    "__pycache__/",
+    "%.egg%-info/",
+    "%.vscode/",
+    "%.idea/",
+    "%.DS_Store$",
+    "%.gitignore",
+    "%.lock",
     -- Add your own patterns here
   },
   
