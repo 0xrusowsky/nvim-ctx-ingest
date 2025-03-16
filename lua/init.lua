@@ -2,10 +2,10 @@
 local M = {}
 
 -- Import modules
-local config = require("ctx-ingest.config")
-local state = require("ctx-ingest.state")
-local fs = require("ctx-ingest.fs")
-local ui = require("ctx-ingest.ui")
+local config = require("nvim-ctx-ingest.config")
+local state = require("nvim-ctx-ingest.state")
+local fs = require("nvim-ctx-ingest.fs")
+local ui = require("nvim-ctx-ingest.ui")
 
 -- Initialize the plugin
 function M.setup(user_config)

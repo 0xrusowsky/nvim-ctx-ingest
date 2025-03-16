@@ -1,8 +1,8 @@
 -- File system operations
 local M = {}
 
-local config = require("ctx-ingest.config")
-local state = require("ctx-ingest.state")
+local config = require("nvim-ctx-ingest.config")
+local state = require("nvim-ctx-ingest.state")
 local fs_cache = {}
 
 -- Get file info

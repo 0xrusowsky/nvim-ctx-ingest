@@ -1,8 +1,8 @@
 local M = {}
 
-local config = require("ctx-ingest.config")
-local state = require("ctx-ingest.state")
-local fs = require("ctx-ingest.fs")
+local config = require("nvim-ctx-ingest.config")
+local state = require("nvim-ctx-ingest.state")
+local fs = require("nvim-ctx-ingest.fs")
 
 -- Number of header lines in the UI
 local HEADER_LINE_COUNT = 7
