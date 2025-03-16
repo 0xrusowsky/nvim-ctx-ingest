@@ -6,7 +6,7 @@ vim.g.loaded_ctx_ingest = 1
 -- Check for required dependency
 local has_devicons, devicons = pcall(require, "nvim-web-devicons")
 if not has_devicons then
-  vim.notify("nvim-web-devicons is required for ctx-ingest", vim.log.levels.ERROR)
+  vim.notify("nvim-web-devicons is required for nvim-ctx-ingest", vim.log.levels.ERROR)
   return
 end
 

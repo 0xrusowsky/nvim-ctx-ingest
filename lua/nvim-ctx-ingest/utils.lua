@@ -4,7 +4,7 @@ local M = {}
 function M.safe_operation(fn, ...)
   local status, result = pcall(fn, ...)
   if not status then
-    vim.notify("Error in ctx-ingest: " .. tostring(result), vim.log.levels.ERROR)
+    vim.notify("Error in nvim-ctx-ingest: " .. tostring(result), vim.log.levels.ERROR)
     return nil
   end
   return result

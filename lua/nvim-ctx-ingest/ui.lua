@@ -107,7 +107,7 @@ function M.setup_buffer()
 
   -- Set buffer options
   vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-  vim.api.nvim_buf_set_option(buf, "filetype", "ctx-ingest")
+  vim.api.nvim_buf_set_option(buf, "filetype", "nvim-ctx-ingest")
   vim.api.nvim_buf_set_option(buf, "modifiable", true)
 
   -- Match the column widths from create_tree_lines
