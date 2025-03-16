@@ -22,7 +22,7 @@ vim.api.nvim_set_hl(0, "CtxIngestDate", { link = "Comment" })
 vim.api.nvim_set_hl(0, "CtxIngestType", { link = "Type" })
 
 vim.api.nvim_create_user_command('CtxIngest', function()
-  require('ctx-ingest').open()
+  require('nvim-ctx-ingest').open()
 end, {})
 
 
