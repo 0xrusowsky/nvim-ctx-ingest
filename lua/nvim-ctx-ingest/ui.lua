@@ -4,8 +4,10 @@ local config = require("nvim-ctx-ingest.config")
 local state = require("nvim-ctx-ingest.state")
 local fs = require("nvim-ctx-ingest.fs")
 
--- Number of header lines in the UI
 local HEADER_LINE_COUNT = 7
+local NAME_COL_WIDTH = 53
+local SIZE_COL_WIDTH = 20
+local DATE_COL_WIDTH = 23
 
 -- Get file icon
 function M.get_file_icon(name, ext, type, is_expanded, has_children)
@@ -50,11 +52,6 @@ function M.create_tree_lines(node, level, lines, selections)
   local checkbox = node.ignored and " "
       or (selections[node.path] and config.get().icons.selected or config.get().icons.unselected)
 
-  -- Fixed widths for each column
-  local name_col_width = 53
-  local size_col_width = 20
-  local date_col_width = 23
-
   -- Ensure consistent icon width with 2 spaces
   local icon_space = string.rep(" ", 2)
 
@@ -65,23 +62,23 @@ function M.create_tree_lines(node, level, lines, selections)
   local display_width = vim.fn.strdisplaywidth(name_content)
 
   local name_field
-  if display_width > name_col_width then
+  if display_width > NAME_COL_WIDTH then
     -- Truncate based on display width
-    name_field = vim.fn.strcharpart(name_content, 0, name_col_width - 1) .. "…"
+    name_field = vim.fn.strcharpart(name_content, 0, NAME_COL_WIDTH - 1) .. "…"
   else
     -- Pad with spaces based on display width
-    name_field = name_content .. string.rep(" ", name_col_width - display_width)
+    name_field = name_content .. string.rep(" ", NAME_COL_WIDTH - display_width)
   end
 
   -- Format size with fixed width, right-aligned
   local size_str = node.size and M.format_size(node.size) or "-"
   local size_display_width = vim.fn.strdisplaywidth(size_str)
-  local size_field = string.rep(" ", size_col_width - size_display_width) .. size_str
+  local size_field = string.rep(" ", SIZE_COL_WIDTH - size_display_width) .. size_str
 
   -- Format date with fixed width, right-aligned
   local date_str = node.mtime and M.format_time(node.mtime) or "-"
   local date_display_width = vim.fn.strdisplaywidth(date_str)
-  local date_field = string.rep(" ", date_col_width - date_display_width) .. date_str
+  local date_field = string.rep(" ", DATE_COL_WIDTH - date_display_width) .. date_str
 
   local line = {
     text = string.format("%s%s%s", name_field, size_field, date_field),
@@ -101,26 +98,19 @@ function M.create_tree_lines(node, level, lines, selections)
   end
 end
 
--- Create the buffer for the UI
-function M.setup_buffer()
-  local buf = vim.api.nvim_create_buf(false, true)
-
-  -- Set buffer options
-  vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-  vim.api.nvim_buf_set_option(buf, "filetype", "nvim-ctx-ingest")
-  vim.api.nvim_buf_set_option(buf, "modifiable", true)
-
+-- Create header
+function M.create_header()
   -- Match the column widths from create_tree_lines
-  local name_col_width = 54
-  local size_col_width = 18
-  local date_col_width = 24
+  local name_col_width = NAME_COL_WIDTH + 1
+  local size_col_width = SIZE_COL_WIDTH - 2
+  local date_col_width = DATE_COL_WIDTH + 1
   local total_width = name_col_width + size_col_width + date_col_width
 
   -- Format patterns for display
   local include_patterns = #config.get().patterns.include > 0 and table.concat(config.get().patterns.include, ", ")
-      or "none"
+      or ""
   local exclude_patterns = #config.get().patterns.exclude > 0 and table.concat(config.get().patterns.exclude, ", ")
-      or "none"
+      or ""
 
   -- Calculate padding for right alignment
   local include_base = string.format("   Include patterns: %s", include_patterns)
@@ -143,8 +133,17 @@ function M.setup_buffer()
     string.format("  %s", string.rep("─", name_col_width + size_col_width + date_col_width - 1)),
   }
 
-  -- Set the lines
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, header)
+  return header
+end
+
+-- Create the buffer for the UI
+function M.setup_buffer()
+  local buf = vim.api.nvim_create_buf(false, true)
+
+  -- Set buffer options
+  vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
+  vim.api.nvim_buf_set_option(buf, "filetype", "nvim-ctx-ingest")
+  vim.api.nvim_buf_set_option(buf, "modifiable", true)
 
   -- Set keymaps
   local opts = { noremap = true, silent = true, buffer = buf }
@@ -236,6 +235,7 @@ function M.render()
     cursor_pos = vim.api.nvim_win_get_cursor(state.win)
   end
 
+  local header = M.create_header()
   local old_lines = state.lines
   state.lines = {}
   M.create_tree_lines(state.tree, 0, state.lines, state.selected_files)
@@ -248,6 +248,7 @@ function M.render()
   vim.api.nvim_buf_set_option(state.buf, "modifiable", true)
 
   -- Use a single operation to update all lines
+  vim.api.nvim_buf_set_lines(state.buf, 0, HEADER_LINE_COUNT, false, header)
   vim.api.nvim_buf_set_lines(state.buf, HEADER_LINE_COUNT, HEADER_LINE_COUNT + #old_lines, false, text_lines)
 
   -- Batch highlight updates
