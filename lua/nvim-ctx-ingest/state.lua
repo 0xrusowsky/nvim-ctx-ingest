@@ -15,14 +15,20 @@ M.rendered_lines = {}
 function M.reset()
   M.selected_files = {}
   M.tree = nil
+  M.buf = nil
+  M.win = nil
   M.lines = {}
   M.cursor_line = 1
   M.node_cache = {}
   M.expanded_paths = {}
   M.rendered_lines = {}
 
-  -- Don't reset buf and win as they might be needed for cleanup
+  -- Also reset patterns in config
+  local config = require("nvim-ctx-ingest.config")
+  config.get().patterns.include = {}
+  config.get().patterns.exclude = {}
 end
+
 
 -- Cache node
 function M.cache_node(node)
