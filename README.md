@@ -1,4 +1,4 @@
-# ctx-ingest
+# nvim-ctx-ingest
 
 A Neovim plugin for efficiently sharing code context with LLMs and AI coding assistants.
 
@@ -6,7 +6,7 @@ A Neovim plugin for efficiently sharing code context with LLMs and AI coding ass
 
 ## Introduction
 
-`ctx-ingest` helps easily provide just the relevant context to AI tools like Claude or ChatGPT. It addresses the common burden of sharing relevant parts of your codebase with LLMs in a structured, efficient format.
+`nvim-ctx-ingest` helps easily provide just the relevant context to AI tools like Claude or ChatGPT. It addresses the common burden of sharing relevant parts of your codebase with LLMs in a structured, efficient format.
 
 The plugin allows you to:
 
@@ -36,12 +36,12 @@ By not breaking you workflow, it allows you to be more productive.
 
 ```lua
 {
-  "yourusername/ctx-ingest",
+  "0xrusowsky/nvim-ctx-ingest",
   dependencies = {
     "nvim-web-devicons", -- required for file icons
   },
   config = function()
-    require("ctx-ingest").setup({
+    require("nvim-ctx-ingest").setup({
       -- your config options here
     })
   end,
@@ -52,10 +52,10 @@ By not breaking you workflow, it allows you to be more productive.
 
 ```lua
 use {
-  "yourusername/ctx-ingest",
+  "0xrusowsky/nvim-ctx-ingest",
   requires = { "nvim-web-devicons" },
   config = function()
-    require("ctx-ingest").setup({
+    require("nvim-ctx-ingest").setup({
       -- your config options here
     })
   end
@@ -88,15 +88,17 @@ use {
 
 ### Including/Excluding Files
 
-- Press `i` to add an include pattern (e.g., `.md` to include only markdown files)
+- Press `i` to add an include pattern (e.g., `%.md` to include only markdown files)
 - Press `e` to add an exclude pattern (e.g., `test/` to exclude test directories)
+
+ > Based on lua patterns
 
 ## Configuration
 
-You can configure `ctx-ingest` by passing options to the setup function:
+You can configure `nvim-ctx-ingest` by passing options to the setup function:
 
 ```lua
-require("ctx-ingest").setup({
+require("nvim-ctx-ingest").setup({
   window = {
     position = "float",
     width = 100,
@@ -123,7 +125,7 @@ require("ctx-ingest").setup({
   max_file_size = 10 * 1024 * 1024, -- 10MB max file size
   
   ignore_patterns = {
-    ".env",
+    "%.env",
     "^%.git/",
     "%.svn/",
     "%.hg/",
@@ -204,7 +206,7 @@ File: README.md
 ================================================
 # My Project
 
-A simple demonstration project.
+A simple demo project.
 ```
 
 ## Contributing
