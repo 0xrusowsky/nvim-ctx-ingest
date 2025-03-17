@@ -6,13 +6,13 @@ A Neovim plugin for efficiently sharing code context with LLMs and AI coding ass
 
 ## Introduction
 
-`nvim-ctx-ingest` helps easily provide just the relevant context to AI tools like Claude or ChatGPT. It addresses the common burden of sharing relevant parts of your codebase with LLMs in a structured, efficient format.
+`nvim-ctx-ingest` helps easily provide just the relevant context LLMs like Claude or ChatGPT. It addresses the common burden of sharing relevant parts of your codebase with LLMs in a structured, efficient format.
 
 The plugin allows you to:
 
 - Select specific files and directories that are relevant to your current task
-- Generate a well-formatted digest that preserves project structure
-- Quickly share this context with your AI assistant without breaking your workflow
+- Generate a well-formatted digest that includes your project tree
+- Quickly share this context with your LLM or code assistant without breaking your workflow
 
 By providing better context, you get more accurate and helpful responses while maintaining control over exactly what code you share.
 By not breaking you workflow, it allows you to be more productive.
