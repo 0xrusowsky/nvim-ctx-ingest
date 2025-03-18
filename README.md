@@ -78,8 +78,6 @@ File: README.md
 A simple demo project.
 ```
 
----
-
 ## Installation
 
 ### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
@@ -210,7 +208,6 @@ require("nvim-ctx-ingest").setup({
   }
 })
 ```
----
 
 ## Contributing
 
