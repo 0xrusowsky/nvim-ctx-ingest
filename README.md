@@ -30,6 +30,56 @@ By not breaking you workflow, it allows you to be more productive.
  - 📋  Auto-copy results to clipboard for pasting into LLM interfaces
  - 🔄  Auto-add output files to `.gitignore` (if enabled)
 
+## Output Format
+
+The generated digest includes:
+
+1. Summary information (directory, file count, total size)
+2. Directory tree
+3. List of selected files
+4. Full content of each selected file with clear separation
+
+Example:
+
+```
+Directory: /path/to/your/project
+Files analyzed: 2
+Total size: 0.04 MB
+
+Directory structure:
+project
+├── src
+│   ├── main.lua
+│   └── utils.lua
+├── tests
+│   └── test_main.lua
+└── README.md
+
+Selected files for content inclusion:
+- src/main.lua
+- README.md
+
+================================================
+File: src/main.lua
+================================================
+local function hello()
+  print("Hello, world!")
+end
+
+return {
+  hello = hello
+}
+
+================================================
+File: README.md
+================================================
+# My Project
+
+A simple demo project.
+```
+
+---
+
 ## Installation
 
 ### Using [lazy.nvim](https://github.com/folke/lazy.nvim)
@@ -160,54 +210,7 @@ require("nvim-ctx-ingest").setup({
   }
 })
 ```
-
-## Output Format
-
-The generated digest includes:
-
-1. Summary information (directory, file count, total size)
-2. Directory tree
-3. List of selected files
-4. Full content of each selected file with clear separation
-
-Example:
-
-```
-Directory: /path/to/your/project
-Files analyzed: 2
-Total size: 0.04 MB
-
-Directory structure:
-project
-├── src
-│   ├── main.lua
-│   └── utils.lua
-├── tests
-│   └── test_main.lua
-└── README.md
-
-Selected files for content inclusion:
-- src/main.lua
-- README.md
-
-================================================
-File: src/main.lua
-================================================
-local function hello()
-  print("Hello, world!")
-end
-
-return {
-  hello = hello
-}
-
-================================================
-File: README.md
-================================================
-# My Project
-
-A simple demo project.
-```
+---
 
 ## Contributing
 
