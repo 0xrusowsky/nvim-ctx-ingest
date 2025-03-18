@@ -1,6 +1,6 @@
 # nvim-ctx-ingest
 
-A Neovim plugin for efficiently sharing your project's context with LLMs.
+A Neovim plugin for efficiently sharing your project's most relevant context with LLMs.
 
 ![Preview image](preview.png)
 
